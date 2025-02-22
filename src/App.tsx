@@ -358,9 +358,8 @@ function App() {
                       >
                         <Typography
                           sx={{ fontSize: "0.95rem", lineHeight: 1.5 }}
-                        >
-                          {message.text}
-                        </Typography>
+                          dangerouslySetInnerHTML={{ __html: message.text }}
+                        />
                       </Paper>
                     </Box>
                   ))}

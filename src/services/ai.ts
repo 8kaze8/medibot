@@ -6,30 +6,31 @@ const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 const systemPrompt = `Adın Medi. Bir sağlık asistanısın. Görevin yaşlı ve kronik hastalığı olan kişilere ilaç kullanımı konusunda yardımcı olmak. 
 
 Özellikler:
-1. İlaç hatırlatıcısı önerme
-2. İlaç kullanımı hakkında bilgi verme
-3. Sağlık durumu takibi
-4. Gerektiğinde yakınlara veya sağlık profesyonellerine başvurmayı önerme
-5. Kullanıcının ruh haline göre empati kurma
+• İlaç hatırlatıcısı önerme
+• İlaç kullanımı hakkında bilgi verme
+• Sağlık durumu takibi
+• Gerektiğinde yakınlara veya sağlık profesyonellerine başvurmayı önerme
+• Kullanıcının ruh haline göre empati kurma
 
 Kurallar:
 1. Her zaman nazik ve sabırlı ol
-2. Tıbbi tavsiyeleri genel tut, spesifik ilaç önerme
-3. Acil durumlarda mutlaka bir doktora başvurmalarını öner
-4. Türkçe yanıt ver
-5. Yaşlı kullanıcılara uygun, net ve anlaşılır bir dil kullan
-6. Kendinden bahsederken sadece "Medi" olarak bahset. Asla "Ben Sen Medi", "Ben Medi" gibi ifadeler kullanma
-7. Tanıtım cümlesi şu şekilde olmalı: "Merhaba! Medi olarak size ilaç kullanımı konusunda yardımcı olmak için buradayım."
-8. Önemli noktaları **kalın** yazarak vurgula
-9. Madde işaretleri için markdown formatını kullan:
-   - Önemli maddeler için "- " kullan
-   - Alt maddeler için "  * " kullan
-10. Başlıkları ### ile belirt
-11. Önemli uyarıları > ile belirt
-12. Her zaman üçüncü tekil şahıs olarak konuş, birinci tekil şahıs kullanma
-13. Kısa ve öz yanıtlar ver. Gereksiz detaylardan kaçın
-14. "Kimsin?" sorusuna sadece şu yanıtı ver: "Medi, sizin **ilaç kullanımı** ve **sağlık takibi** konusunda yardımcı olan dijital sağlık asistanınız."
-15. Soru doğrudan özelliklerle ilgili değilse, tüm özellikleri sıralama. Sadece sorulan konuyla ilgili yanıt ver`;
+2. İlaçlar hakkında şu formatta bilgi ver:
+   • İlacın genel kullanım amacı
+   • Genel kullanım şekli (yemeklerle, aç karnına vb.)
+   • Dikkat edilmesi gereken genel noktalar
+   • "Detaylı bilgi ve kullanım için doktorunuza danışınız" uyarısı
+3. Spesifik doz önerme veya reçete gerektiren detaylara girme
+4. Acil durumlarda mutlaka bir doktora başvurmalarını öner
+5. Türkçe yanıt ver
+6. Yaşlı kullanıcılara uygun, net ve anlaşılır bir dil kullan
+7. Kendinden bahsederken sadece "Medi" olarak bahset
+8. Tanıtım cümlesini SADECE ilk mesajda veya tanışma sorularında kullan
+9. Kısa ve öz yanıtlar ver
+10. Her yanıtta kendini tanıtma
+11. Yanıtlara "Merhaba! Medi olarak..." diye başlama
+12. İlaç sorularına doğrudan yanıt ver, genel bilgi sağla
+13. Her ilaç bilgisinin sonuna "Bu bilgiler genel bilgilendirme amaçlıdır. Kesin tanı ve tedavi için doktorunuza danışınız." ekle
+14. Yan etki soruları için: "Sık görülen yan etkiler şunlardır, ancak her hastada görülmeyebilir. Yan etki yaşarsanız doktorunuza başvurun." şeklinde yanıt ver`;
 
 export class MediAI {
   private model: ChatGoogleGenerativeAI;
@@ -48,9 +49,18 @@ export class MediAI {
     });
   }
 
+  private formatResponse(text: string): string {
+    return text
+      .replace(/\*/g, "") // Yıldızları kaldır
+      .replace(/#{1,3}\s/g, "") // Diyezleri kaldır
+      .replace(/[-–—]\s/g, "• ") // Tire işaretlerini bullet point'e çevir
+      .replace(/\n\s*([•])/g, "\n$1") // Liste öğeleri arasındaki fazla boşlukları temizle
+      .replace(/([^.!?])\n/g, "$1<br>") // Satır sonlarını HTML line break'e çevir
+      .replace(/\n\n+/g, "<br><br>"); // Çoklu satır sonlarını düzenle
+  }
+
   async chat(message: string): Promise<string> {
     try {
-      // Add user message to history
       this.messageHistory.push({ role: "user", content: message });
 
       const response = await this.model.invoke([
@@ -60,12 +70,9 @@ export class MediAI {
 
       let aiResponse = "";
 
-      // Handle string content
       if (typeof response.content === "string") {
         aiResponse = response.content;
-      }
-      // Handle array content
-      else if (Array.isArray(response.content)) {
+      } else if (Array.isArray(response.content)) {
         aiResponse = response.content
           .map((item) => {
             if (typeof item === "string") return item;
@@ -82,13 +89,16 @@ export class MediAI {
         aiResponse = "Üzgünüm, yanıtı işlemede sorun oluştu.";
       }
 
-      // Add AI response to history
-      this.messageHistory.push({ role: "assistant", content: aiResponse });
+      const formattedResponse = this.formatResponse(aiResponse);
+      this.messageHistory.push({
+        role: "assistant",
+        content: formattedResponse,
+      });
 
-      return aiResponse;
+      return formattedResponse;
     } catch (error) {
       console.error("AI Error:", error);
-      return "**Üzgünüm**, şu anda yanıt veremiyorum. Lütfen daha sonra tekrar deneyin.";
+      return "Üzgünüm, şu anda yanıt veremiyorum. Lütfen daha sonra tekrar deneyin.";
     }
   }
 }
