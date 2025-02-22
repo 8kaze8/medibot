@@ -333,6 +333,8 @@ function App() {
                 display: "flex",
                 flexDirection: "column",
                 gap: 2,
+                justifyContent: !selectedChat ? "center" : "flex-start",
+                alignItems: !selectedChat ? "center" : "stretch",
                 "&::-webkit-scrollbar": { width: "8px" },
                 "&::-webkit-scrollbar-track": {
                   backgroundColor: "background.default",
@@ -347,7 +349,7 @@ function App() {
                 },
               }}
             >
-              {!selectedChat ? (
+              {!selectedChat || chats.length === 0 ? (
                 <WelcomeScreen
                   onNewChat={handleNewChat}
                   onQuickStart={handleQuickStart}
