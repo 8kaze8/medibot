@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import { Chat, Message } from "./types/chat";
 import Sidebar from "./components/layout/Sidebar";
 import WelcomeScreen from "./components/chat/WelcomeScreen";
+import { mediAI } from "./services/ai";
 
 const DRAWER_WIDTH = 300;
 const STORAGE_KEY = "medi_chats";
@@ -157,7 +158,6 @@ function App() {
         if (chat.id === selectedChat) {
           // If this is the first message, use it as chat title
           if (chat.messages.length === 0) {
-            // Use the message as the chat title if it's not too long
             const newTitle =
               userMessage.text.length <= 30
                 ? userMessage.text
@@ -185,11 +185,12 @@ function App() {
     setInputMessage("");
     setIsLoading(true);
 
-    // Simulate bot response
-    setTimeout(() => {
+    try {
+      const aiResponse = await mediAI.chat(userMessage.text);
+
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "Bu bir örnek yanıttır. API entegrasyonu sonra eklenecek.",
+        text: aiResponse,
         isBot: true,
         timestamp: Date.now(),
       };
@@ -207,9 +208,32 @@ function App() {
           return chat;
         })
       );
+    } catch (error) {
+      console.error("Error getting AI response:", error);
 
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "Üzgünüm, bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+        isBot: true,
+        timestamp: Date.now(),
+      };
+
+      setChats((prev) =>
+        prev.map((chat) => {
+          if (chat.id === selectedChat) {
+            return {
+              ...chat,
+              messages: [...chat.messages, errorMessage],
+              lastMessage: errorMessage.text,
+              timestamp: errorMessage.timestamp,
+            };
+          }
+          return chat;
+        })
+      );
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

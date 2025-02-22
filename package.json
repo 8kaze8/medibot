@@ -15,7 +15,9 @@
     "@mui/icons-material": "^5.15.10",
     "@mui/material": "^5.15.10",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "langchain": "^0.1.21",
+    "@langchain/google-genai": "^0.0.10"
   },
   "devDependencies": {
     "@types/react": "^18.2.55",
