@@ -108,11 +108,19 @@ function App() {
   };
 
   const handleNewChat = () => {
+    const welcomeMessage = mediAI.getWelcomeMessage();
     const newChat: Chat = {
       id: Date.now().toString(),
-      title: `Yeni Sohbet ${chats.length + 1}`,
-      messages: [],
-      lastMessage: "",
+      title: "Yeni Sohbet",
+      messages: [
+        {
+          id: Date.now().toString(),
+          text: welcomeMessage,
+          isBot: true,
+          timestamp: Date.now(),
+        },
+      ],
+      lastMessage: welcomeMessage,
       timestamp: Date.now(),
     };
 

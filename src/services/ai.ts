@@ -1,5 +1,5 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { HumanMessage, SystemMessage } from "langchain/schema";
+import { HumanMessage, SystemMessage, AIMessage } from "langchain/schema";
 
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 
@@ -26,7 +26,7 @@ Kurallar:
 7. Kendinden bahsederken sadece "Medi" olarak bahset
 8. Tanıtım cümlesini SADECE ilk mesajda veya tanışma sorularında kullan
 9. Kısa ve öz yanıtlar ver
-10. Her yanıtta kendini tanıtma
+10. Sohbet geçmişini hatırla ve bağlamı koru
 11. Yanıtlara "Merhaba! Medi olarak..." diye başlama
 12. İlaç sorularına doğrudan yanıt ver, genel bilgi sağla
 13. Her ilaç bilgisinin sonuna "Bu bilgiler genel bilgilendirme amaçlıdır. Kesin tanı ve tedavi için doktorunuza danışınız." ekle
@@ -44,29 +44,46 @@ export class MediAI {
     this.model = new ChatGoogleGenerativeAI({
       apiKey: GOOGLE_API_KEY,
       modelName: "gemini-pro",
-      maxOutputTokens: 2048,
+      maxOutputTokens: 1024,
       temperature: 0.7,
+      maxRetries: 3,
+    });
+
+    // İlk karşılama mesajını ekle
+    this.messageHistory.push({
+      role: "assistant",
+      content:
+        "Merhaba! Ben Medi, sağlık asistanınız. İlaç kullanımı konusunda size yardımcı olmak için buradayım. İlaç hatırlatıcıları, kullanım bilgileri ve sağlık takibi konularında destek sağlayabilirim. Size nasıl yardımcı olabilirim?",
     });
   }
 
   private formatResponse(text: string): string {
     return text
-      .replace(/\*/g, "") // Yıldızları kaldır
-      .replace(/#{1,3}\s/g, "") // Diyezleri kaldır
-      .replace(/[-–—]\s/g, "• ") // Tire işaretlerini bullet point'e çevir
-      .replace(/\n\s*([•])/g, "\n$1") // Liste öğeleri arasındaki fazla boşlukları temizle
-      .replace(/([^.!?])\n/g, "$1<br>") // Satır sonlarını HTML line break'e çevir
-      .replace(/\n\n+/g, "<br><br>"); // Çoklu satır sonlarını düzenle
+      .replace(/\*/g, "")
+      .replace(/#{1,3}\s/g, "")
+      .replace(/[-–—]\s/g, "• ")
+      .replace(/\n\s*([•])/g, "\n$1")
+      .replace(/([^.!?])\n/g, "$1<br>")
+      .replace(/\n\n+/g, "<br><br>")
+      .trim();
   }
 
   async chat(message: string): Promise<string> {
     try {
+      // Yeni mesajı ekle
       this.messageHistory.push({ role: "user", content: message });
 
-      const response = await this.model.invoke([
-        new SystemMessage(systemPrompt),
-        new HumanMessage(message),
-      ]);
+      // Mesaj geçmişini dönüştür
+      const chatMessages = this.messageHistory.map((msg) =>
+        msg.role === "user"
+          ? new HumanMessage(msg.content)
+          : new AIMessage(msg.content)
+      );
+
+      // System message'ı en başa ekle
+      const messages = [new SystemMessage(systemPrompt), ...chatMessages];
+
+      const response = await this.model.invoke(messages);
 
       let aiResponse = "";
 
@@ -100,6 +117,11 @@ export class MediAI {
       console.error("AI Error:", error);
       return "Üzgünüm, şu anda yanıt veremiyorum. Lütfen daha sonra tekrar deneyin.";
     }
+  }
+
+  // İlk karşılama mesajını döndür
+  getWelcomeMessage(): string {
+    return this.messageHistory[0].content;
   }
 }
 
