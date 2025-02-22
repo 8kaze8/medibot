@@ -115,7 +115,7 @@ function App() {
     const welcomeMessage = mediAI.getWelcomeMessage();
     const newChat: Chat = {
       id: Date.now().toString(),
-      title: "Yeni Sohbet",
+      title: "Yeni sohbet",
       messages: [
         {
           id: Date.now().toString(),
@@ -168,12 +168,22 @@ function App() {
     setChats((prev) =>
       prev.map((chat) => {
         if (chat.id === selectedChat) {
-          // If this is the first message, use it as chat title
-          if (chat.messages.length === 0) {
-            const newTitle =
-              userMessage.text.length <= 30
-                ? userMessage.text
-                : userMessage.text.substring(0, 27) + "...";
+          // If this is the first user message, create a title
+          if (chat.messages.length === 1) {
+            let newTitle = userMessage.text;
+
+            // Eğer soru işareti varsa, soru kısmını al
+            if (newTitle.includes("?")) {
+              newTitle = newTitle.split("?")[0] + "?";
+            }
+
+            // Başlığı kısalt
+            if (newTitle.length > 30) {
+              newTitle = newTitle.substring(0, 27) + "...";
+            }
+
+            // İlk harfi büyük yap
+            newTitle = newTitle.charAt(0).toUpperCase() + newTitle.slice(1);
 
             return {
               ...chat,

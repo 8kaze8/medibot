@@ -1,50 +1,76 @@
-# React + TypeScript + Vite
+# Medi - Akıllı Sağlık Asistanı
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Medi, ReMedi sağlık uygulamasının yapay zeka destekli akıllı asistanıdır. Bu proje, Google Yapay Zeka ve Teknoloji Akademisi'nin düzenlediği Ideathon etkinliği kapsamında geliştirilmiş olup, ileride ReMedi uygulamasına tam entegrasyonu planlanmaktadır.
 
-Currently, two official plugins are available:
+## 🎯 Proje Hakkında
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Medi, yaşlılar ve kronik hastalığı olan kişiler için geliştirilmiş, ilaç yönetimi ve sağlık takibi konusunda uzmanlaşmış bir sağlık asistanıdır. Google'ın Gemini yapay zeka modelini kullanarak, kullanıcılara kişiselleştirilmiş sağlık desteği sunar.
 
-## Expanding the ESLint configuration
+## ✨ Özellikler
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- 💊 İlaç Yönetimi ve Hatırlatma
 
-- Configure the top-level `parserOptions` property like this:
+  - Günlük, haftalık ve aylık ilaç programı
+  - İlaç etkileşimleri hakkında bilgilendirme
+  - İlaç kullanım zamanları ve saklama koşulları
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- 🏥 Kronik Hastalık Takibi
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+  - Hastalık belirtilerinin takibi
+  - Yaşam tarzı önerileri
+  - Risk faktörleri değerlendirmesi
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+- 👵 Yaşlı Sağlığı Desteği
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+  - Beslenme ve hidrasyon takibi
+  - Düşme riski ve önlemleri
+  - Fiziksel aktivite önerileri
+
+- 👨‍👩‍👦 Aile ve Bakıcı İletişimi
+  - Sağlık durumu raporlama
+  - İlaç kullanım takibi paylaşımı
+  - Acil durum iletişim protokolleri
+
+## 🛠️ Teknolojiler
+
+- React + TypeScript
+- Vite
+- Material-UI (MUI)
+- Google Gemini AI
+- LangChain
+
+## 🚀 Kurulum
+
+1. Projeyi klonlayın:
+
+   ```bash
+   git clone https://github.com/yourusername/medibot.git
+   cd medibot
+   ```
+
+2. Bağımlılıkları yükleyin:
+
+   ```bash
+   npm install
+   ```
+
+3. `.env` dosyası oluşturun ve Google API anahtarınızı ekleyin:
+
+   ```env
+   VITE_GOOGLE_API_KEY=your_api_key_here
+   ```
+
+4. Geliştirme sunucusunu başlatın:
+   ```bash
+   npm run dev
+   ```
+
+## 📱 Kullanım
+
+1. Yeni bir sohbet başlatın
+2. Sağlık veya ilaçlarınızla ilgili sorularınızı sorun
+3. Medi size anlayışlı ve net yanıtlar verecektir
+
+---
+
+Bu proje Google Yapay Zeka ve Teknoloji Akademisi'nin Ideathon etkinliği kapsamında Kadir Zeyrek tarafından geliştirilmiştir. © 2024
