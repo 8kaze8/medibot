@@ -6,12 +6,14 @@ import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import SendIcon from "@mui/icons-material/Send";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
+import MenuIcon from "@mui/icons-material/Menu";
 import Typography from "@mui/material/Typography";
 import { useState, useEffect } from "react";
 import { Chat, Message } from "./types/chat";
 import Sidebar from "./components/layout/Sidebar";
 import WelcomeScreen from "./components/chat/WelcomeScreen";
 import { mediAI } from "./services/ai";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const DRAWER_WIDTH = 300;
 const STORAGE_KEY = "medi_chats";
@@ -83,6 +85,8 @@ function App() {
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   // Load chats from localStorage on initial render
   useEffect(() => {
@@ -253,18 +257,47 @@ function App() {
 
   const currentChat = getCurrentChat();
 
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ display: "flex", minHeight: "100vh" }}>
+        {isMobile && (
+          <IconButton
+            color="primary"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            sx={{
+              position: "fixed",
+              top: 8,
+              left: 8,
+              zIndex: 1200,
+              bgcolor: "background.paper",
+              boxShadow: 1,
+              "&:hover": { bgcolor: "background.paper" },
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
+
         <Sidebar
           width={DRAWER_WIDTH}
           chats={chats}
           selectedChat={selectedChat}
           onNewChat={handleNewChat}
-          onSelectChat={setSelectedChat}
+          onSelectChat={(chatId) => {
+            setSelectedChat(chatId);
+            if (isMobile) setMobileOpen(false);
+          }}
           onEditChat={handleEditChat}
           onDeleteChat={handleDeleteChat}
+          mobileOpen={mobileOpen}
+          onDrawerToggle={handleDrawerToggle}
         />
 
         <Box
@@ -284,16 +317,18 @@ function App() {
               display: "flex",
               flexDirection: "column",
               overflow: "hidden",
-              borderRadius: 4,
+              borderRadius: { xs: 2, md: 4 },
               border: "1px solid",
               borderColor: "divider",
               bgcolor: "background.paper",
+              mt: { xs: 5, md: 0 },
+              width: "100%",
             }}
           >
             <Box
               sx={{
                 flex: 1,
-                p: 3,
+                p: { xs: 2, md: 3 },
                 overflowY: "auto",
                 display: "flex",
                 flexDirection: "column",
@@ -436,7 +471,7 @@ function App() {
 
             <Box
               sx={{
-                p: { xs: 2, md: 3 },
+                p: { xs: 1.5, md: 3 },
                 borderTop: "1px solid",
                 borderColor: "divider",
                 bgcolor: "background.paper",
@@ -460,7 +495,8 @@ function App() {
                   disabled={!selectedChat}
                   sx={{
                     "& .MuiOutlinedInput-root": {
-                      padding: "8px 14px",
+                      padding: { xs: "6px 10px", md: "8px 14px" },
+                      fontSize: { xs: "0.9rem", md: "1rem" },
                     },
                   }}
                 />
@@ -471,8 +507,8 @@ function App() {
                   sx={{
                     bgcolor: "primary.main",
                     color: "white",
-                    width: 40,
-                    height: 40,
+                    width: { xs: 35, md: 40 },
+                    height: { xs: 35, md: 40 },
                     "&:hover": {
                       bgcolor: "primary.dark",
                     },
@@ -482,7 +518,7 @@ function App() {
                     },
                   }}
                 >
-                  <SendIcon sx={{ fontSize: 20 }} />
+                  <SendIcon sx={{ fontSize: { xs: 18, md: 20 } }} />
                 </IconButton>
               </Box>
             </Box>

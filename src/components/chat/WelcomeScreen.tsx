@@ -50,7 +50,9 @@ const WelcomeScreen = ({ onNewChat, onQuickStart }: WelcomeScreenProps) => {
           gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
           gap: 2,
           width: "100%",
-          maxWidth: 800,
+          maxWidth: "800px",
+          mx: "auto",
+          px: { xs: 2, md: 4 },
         }}
       >
         <Button
@@ -66,6 +68,7 @@ const WelcomeScreen = ({ onNewChat, onQuickStart }: WelcomeScreenProps) => {
             borderRadius: 2,
             textAlign: "left",
             textTransform: "none",
+            maxWidth: "100%",
           }}
         >
           <Box>

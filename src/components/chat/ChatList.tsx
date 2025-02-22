@@ -7,6 +7,8 @@ import {
   Box,
   IconButton,
   TextField,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 import EditIcon from "@mui/icons-material/Edit";
@@ -39,6 +41,8 @@ const ChatList = ({
   const [editingChatId, setEditingChatId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const editInputRef = useRef<HTMLInputElement>(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const handleEditStart = (chatId: string, currentTitle: string) => {
     setEditingChatId(chatId);
@@ -81,6 +85,7 @@ const ChatList = ({
             onClick={() => onSelectChat(chat.id)}
             sx={{
               pr: 8,
+              py: { xs: 1.2, md: 1.5 },
               "&.Mui-selected": {
                 backgroundColor: "primary.light",
                 "&:hover": {
@@ -89,9 +94,10 @@ const ChatList = ({
               },
             }}
           >
-            <ListItemIcon>
+            <ListItemIcon sx={{ minWidth: { xs: 36, md: 40 } }}>
               <ChatIcon
                 color={selectedChat === chat.id ? "primary" : "action"}
+                sx={{ fontSize: { xs: 20, md: 24 } }}
               />
             </ListItemIcon>
             {editingChatId === chat.id ? (
@@ -112,13 +118,14 @@ const ChatList = ({
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     backgroundColor: "background.paper",
+                    fontSize: { xs: "0.9rem", md: "1rem" },
                   },
                 }}
               />
             ) : (
               <Typography
                 sx={{
-                  fontSize: "0.9rem",
+                  fontSize: { xs: "0.85rem", md: "0.9rem" },
                   fontWeight: selectedChat === chat.id ? 600 : 400,
                   flex: 1,
                   overflow: "hidden",
@@ -134,12 +141,12 @@ const ChatList = ({
             className="chat-actions"
             sx={{
               position: "absolute",
-              right: 12,
+              right: { xs: 8, md: 12 },
               top: "50%",
               transform: "translateY(-50%)",
               display: "flex",
               gap: 0.5,
-              opacity: 0,
+              opacity: isMobile ? 1 : 0,
               transition: "opacity 0.2s ease-in-out",
               backgroundColor:
                 selectedChat === chat.id ? "primary.light" : "background.paper",
@@ -149,14 +156,14 @@ const ChatList = ({
             }}
           >
             <IconButton
-              size="small"
+              size={isMobile ? "small" : "medium"}
               onClick={(e) => {
                 e.stopPropagation();
                 handleEditStart(chat.id, chat.title);
               }}
               sx={{
-                width: 28,
-                height: 28,
+                width: { xs: 24, md: 28 },
+                height: { xs: 24, md: 28 },
                 backgroundColor: "primary.main",
                 color: "white",
                 "&:hover": {
@@ -164,17 +171,17 @@ const ChatList = ({
                 },
               }}
             >
-              <EditIcon sx={{ fontSize: 16 }} />
+              <EditIcon sx={{ fontSize: { xs: 14, md: 16 } }} />
             </IconButton>
             <IconButton
-              size="small"
+              size={isMobile ? "small" : "medium"}
               onClick={(e) => {
                 e.stopPropagation();
                 onDeleteChat(chat.id);
               }}
               sx={{
-                width: 28,
-                height: 28,
+                width: { xs: 24, md: 28 },
+                height: { xs: 24, md: 28 },
                 backgroundColor: "error.main",
                 color: "white",
                 "&:hover": {
@@ -182,7 +189,7 @@ const ChatList = ({
                 },
               }}
             >
-              <DeleteIcon sx={{ fontSize: 16 }} />
+              <DeleteIcon sx={{ fontSize: { xs: 14, md: 16 } }} />
             </IconButton>
           </Box>
         </ListItem>
