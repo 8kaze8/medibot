@@ -9,5 +9,17 @@ export default defineConfig({
       "@": "/src",
     },
   },
-  base: "/medibot/",
+  build: {
+    outDir: "dist",
+    assetsDir: "assets",
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom"],
+          mui: ["@mui/material", "@mui/icons-material"],
+        },
+      },
+    },
+  },
 });
