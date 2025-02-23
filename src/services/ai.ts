@@ -305,7 +305,7 @@ export class MediAI {
     });
   }
 
-  private getContextualPrompt(userMessage: string): string {
+  private getContextualPrompt(): string {
     let contextPrompt = "";
 
     if (this.userContext.medications?.length) {
@@ -329,7 +329,7 @@ export class MediAI {
     try {
       this.messageHistory.push({ role: "user", content: message });
 
-      const contextPrompt = this.getContextualPrompt(message);
+      const contextPrompt = this.getContextualPrompt();
       const chatMessages = this.messageHistory.map((msg) =>
         msg.role === "user"
           ? new HumanMessage(msg.content)
