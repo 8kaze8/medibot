@@ -136,8 +136,8 @@ const Sidebar = ({
             },
           }}
         >
-          <GitHubIcon sx={{ fontSize: 20 }} />
-          <Typography variant="caption" sx={{ fontWeight: 500 }}>
+          <GitHubIcon sx={{ fontSize: { xs: 24, md: 28 } }} />
+          <Typography variant="body2" sx={{ fontWeight: 500 }}>
             GitHub
           </Typography>
         </Link>
