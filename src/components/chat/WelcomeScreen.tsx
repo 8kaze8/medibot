@@ -1,9 +1,9 @@
 import { Box, Typography, Button } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import FamilyRestroomIcon from "@mui/icons-material/FamilyRestroom";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
-import LiveHelpIcon from "@mui/icons-material/LiveHelp";
 import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
+import InfoIcon from "@mui/icons-material/Info";
+import ChatIcon from "@mui/icons-material/Chat";
 
 interface WelcomeScreenProps {
   onNewChat: () => void;
@@ -59,7 +59,9 @@ const WelcomeScreen = ({ onNewChat, onQuickStart }: WelcomeScreenProps) => {
           variant="outlined"
           startIcon={<AccessTimeIcon />}
           onClick={() =>
-            onQuickStart("İlaç hatırlatıcısı nasıl ayarlayabilirim?")
+            onQuickStart(
+              "Günlük Coumadin 5mg ilacımı akşam 21:00'da almam gerekiyor, ReMedi'de ilaç takibi oluşturur musun?"
+            )
           }
           sx={{
             justifyContent: "flex-start",
@@ -68,7 +70,6 @@ const WelcomeScreen = ({ onNewChat, onQuickStart }: WelcomeScreenProps) => {
             borderRadius: 2,
             textAlign: "left",
             textTransform: "none",
-            maxWidth: "100%",
           }}
         >
           <Box>
@@ -76,16 +77,18 @@ const WelcomeScreen = ({ onNewChat, onQuickStart }: WelcomeScreenProps) => {
               İlaç Hatırlatıcısı
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Günlük ilaç takibiniz için hatırlatıcı ayarlayın
+              Günlük ilaç takibiniz için ReMedi'de hatırlatıcı oluşturun
             </Typography>
           </Box>
         </Button>
 
         <Button
           variant="outlined"
-          startIcon={<FamilyRestroomIcon />}
+          startIcon={<InfoIcon />}
           onClick={() =>
-            onQuickStart("Yakınlarımla nasıl bağlantı kurabilirim?")
+            onQuickStart(
+              "Coumadin ilacı hakkında detaylı bilgi alabilir miyim? Kullanım amacı, yan etkileri ve dikkat edilmesi gerekenler nelerdir?"
+            )
           }
           sx={{
             justifyContent: "flex-start",
@@ -98,10 +101,10 @@ const WelcomeScreen = ({ onNewChat, onQuickStart }: WelcomeScreenProps) => {
         >
           <Box>
             <Typography variant="subtitle1" sx={{ fontWeight: 500, mb: 0.5 }}>
-              Yakınlarla Bağlantı
+              İlaç Bilgileri
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Aileniz ve bakıcılarınızla iletişim kurun
+              İlaçlarınız hakkında detaylı bilgi alın
             </Typography>
           </Box>
         </Button>
@@ -110,7 +113,9 @@ const WelcomeScreen = ({ onNewChat, onQuickStart }: WelcomeScreenProps) => {
           variant="outlined"
           startIcon={<LocalHospitalIcon />}
           onClick={() =>
-            onQuickStart("Sağlık profesyoneline ne zaman başvurmalıyım?")
+            onQuickStart(
+              "ReMedi'de sağlık değerlerimi nasıl takip edebilirim? Tansiyonum yükseldiğinde doktora başvurmam gerekir mi?"
+            )
           }
           sx={{
             justifyContent: "flex-start",
@@ -123,18 +128,22 @@ const WelcomeScreen = ({ onNewChat, onQuickStart }: WelcomeScreenProps) => {
         >
           <Box>
             <Typography variant="subtitle1" sx={{ fontWeight: 500, mb: 0.5 }}>
-              Sağlık Desteği
+              Sağlık Takibi
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Ne zaman doktora başvurmanız gerektiğini öğrenin
+              Sağlık değerlerinizi ReMedi'de kaydedin ve takip edin
             </Typography>
           </Box>
         </Button>
 
         <Button
           variant="outlined"
-          startIcon={<LiveHelpIcon />}
-          onClick={() => onQuickStart("Medi'nin özellikleri nelerdir?")}
+          startIcon={<ChatIcon />}
+          onClick={() =>
+            onQuickStart(
+              "Medi, bugün kendimi biraz endişeli hissediyorum. Seninle biraz dertleşebilir miyiz?"
+            )
+          }
           sx={{
             justifyContent: "flex-start",
             px: 3,
@@ -146,10 +155,10 @@ const WelcomeScreen = ({ onNewChat, onQuickStart }: WelcomeScreenProps) => {
         >
           <Box>
             <Typography variant="subtitle1" sx={{ fontWeight: 500, mb: 0.5 }}>
-              Genel Yardım
+              Dertleşelim
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Medi'nin tüm özelliklerini keşfedin
+              Sağlık yolculuğunuzda size destek olalım
             </Typography>
           </Box>
         </Button>
@@ -160,7 +169,7 @@ const WelcomeScreen = ({ onNewChat, onQuickStart }: WelcomeScreenProps) => {
         startIcon={<QuestionAnswerIcon />}
         onClick={onNewChat}
         sx={{
-          mt: 4,
+          mt: 2,
           px: 4,
           py: 1.5,
           borderRadius: 2,
