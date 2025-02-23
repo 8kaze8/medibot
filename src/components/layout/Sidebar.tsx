@@ -5,9 +5,11 @@ import {
   Drawer,
   useTheme,
   useMediaQuery,
+  Link,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
+import GitHubIcon from "@mui/icons-material/GitHub";
 import ChatList from "../chat/ChatList";
 
 interface Chat {
@@ -51,6 +53,7 @@ const Sidebar = ({
         display: "flex",
         flexDirection: "column",
         height: "100%",
+        position: "relative",
       }}
     >
       <Box
@@ -106,6 +109,39 @@ const Sidebar = ({
         onEditChat={onEditChat}
         onDeleteChat={onDeleteChat}
       />
+
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: { xs: 12, md: 16 },
+          left: 0,
+          right: 0,
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <Link
+          href="https://github.com/8kaze8/medibot"
+          target="_blank"
+          rel="noopener noreferrer"
+          color="inherit"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            textDecoration: "none",
+            color: "text.secondary",
+            "&:hover": {
+              color: "primary.main",
+            },
+          }}
+        >
+          <GitHubIcon sx={{ fontSize: 20 }} />
+          <Typography variant="caption" sx={{ fontWeight: 500 }}>
+            GitHub
+          </Typography>
+        </Link>
+      </Box>
     </Box>
   );
 

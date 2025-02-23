@@ -94,11 +94,8 @@ function App() {
     if (savedChats) {
       const parsedChats = JSON.parse(savedChats);
       setChats(parsedChats);
-
-      // Select the most recent chat if exists
-      if (parsedChats.length > 0) {
-        setSelectedChat(parsedChats[0].id);
-      }
+      // Her zaman WelcomeScreen ile başla
+      setSelectedChat(null);
     }
   }, []);
 
