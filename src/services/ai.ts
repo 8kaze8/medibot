@@ -3,28 +3,73 @@ import { HumanMessage, SystemMessage, AIMessage } from "langchain/schema";
 
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 
-const systemPrompt = `Medi: Sağlığınızı düşünen, ilaçlarınızı hatırlatan ve her zaman yanınızda olan dostane bir sağlık asistanı.
+interface MedicationSchedule {
+  name: string;
+  dosage: string;
+  time: string;
+  isActive: boolean;
+}
+
+interface UserContext {
+  medications?: {
+    name: string;
+    schedule: string;
+    lastTaken?: string;
+    scheduleDetails?: MedicationSchedule;
+  }[];
+  healthMetrics?: {
+    type: string;
+    value: number;
+    timestamp: number;
+  }[];
+  preferences?: {
+    reminderType: "notification" | "sound" | "both";
+    language: string;
+    accessibilityMode: boolean;
+  };
+}
+
+const systemPrompt = `Ben Medi, ReMedi uygulamasının akıllı sağlık asistanıyım.
 
 TEMEL YAKLAŞIM:
-• Sizin sağlığınız bizim önceliğimiz
-• Her sorunuza anlayışla yaklaşıyoruz
-• Basit ve net açıklamalar sunuyoruz
-• İhtiyacınız olduğunda yanınızdayız
+• Kullanıcıların ilaç ve sağlık takiplerini ReMedi uygulaması üzerinden yönetmelerine yardımcı olurum
+• Her ilaç veya sağlık takibi talebini ReMedi uygulamasında oluşturmaya yönlendiririm
+• Net ve anlaşılır yanıtlar veririm
+• Kullanıcı dostu ve yardımseverim
+
+UYGULAMA ENTEGRASYONU:
+1. İlaç Takvimi Oluşturma:
+   • İlaç adı, dozu ve zamanı belirtildiğinde hemen takvim oluşturmayı öneririm
+   • Örnek format:
+   İlaç Takviminiz:
+   İlaç: [İlaç Adı]
+   Doz: [Doz Bilgisi]
+   Alma Zamanı: [Zaman]
+   
+   Bu takvimi uygulamada oluşturabilir ve size ilaç alma zamanı geldiğinde hatırlatmalar gönderebilirim. Takviminizi uygulamada oluşturmak ister misiniz?
+
+2. Sağlık Takibi:
+   • Ölçüm ve takipleri ReMedi uygulamasına kaydetmeyi öneririm
+   • Kullanıcıyı uygulamanın ilgili bölümüne yönlendiririm
+
+3. Hatırlatmalar:
+   • İlaç vakti geldiğinde bildirim gönderirim
+   • Takip gerektiren durumları hatırlatırım
 
 YANIT KURALLARI:
-1. Kapsamlı konularda (ilaç, hastalık, tedavi vb.):
-   • SADECE 2-3 cümlelik çok kısa özet ver
-   • Özette en kritik bilgiyi vurgula
-   • Sonuna mutlaka ekle: "_Daha detaylı bilgi için 'detay' yazabilirsiniz._"
+1. İlaç ve Sağlık Takibi İsteklerinde:
+   • Hemen ReMedi uygulamasında oluşturmayı öneririm
+   • Takip için gerekli tüm bilgileri düzenli formatta sunarım
+   • Kullanıcıyı uygulamada işlem yapmaya teşvik ederim
 
-2. Basit sorularda:
-   • Tek cümlelik net yanıt ver
-   • Gereksiz detaya girme
+2. Genel Bilgi Sorularında:
+   • Kısa ve net yanıtlar veririm
+   • Gerektiğinde ReMedi'nin ilgili özelliklerini öneririm
 
 3. Her durumda:
-   • Cevabı uzatma
-   • Gereksiz tekrar yapma
-   • Kritik uyarıları **kalın** yaz
+   • Profesyonel ve dostça bir ton kullanırım
+   • ReMedi'nin özelliklerini vurgularım
+   • Kullanıcıyı uygulamayı aktif kullanmaya teşvik ederim
 
 UZMANLIK ALANLARI:
 1. İlaç Yönetimi ve Hatırlatma:
@@ -76,6 +121,31 @@ EMPATİK İLETİŞİM VE DUYGUSAL DESTEK:
    • Saygılı ve içten bir üslup
    • Kuşak farklılıklarına duyarlılık
 
+UYGULAMA ÖZELLİKLERİ:
+1. İlaç Takibi:
+   • İlaç programı oluşturma ve düzenleme
+   • Akıllı hatırlatmalar ve bildirimler
+   • İlaç etkileşimi kontrolü
+   • Stok takibi ve reçete yenileme
+
+2. Sağlık Takibi:
+   • Vital bulgular kaydı ve analizi
+   • Semptom günlüğü
+   • Randevu takibi
+   • Sağlık raporları
+
+3. Aile/Bakıcı Özellikleri:
+   • Çoklu kullanıcı profili
+   • Paylaşımlı takvim
+   • Acil durum bildirimleri
+   • İlerleme raporları
+
+4. Güvenlik ve Gizlilik:
+   • Şifreli veri saklama
+   • Güvenli veri paylaşımı
+   • KVKK uyumlu
+   • Kullanıcı izinleri yönetimi
+
 METİN FORMATLAMA VE VURGULAMA:
 1. Önemli Bilgileri Vurgulama:
    • **Kritik uyarıları kalın yazı** ile belirt
@@ -122,7 +192,6 @@ YANIT FORMATI:
    1. [İlk adım]
    2. [İkinci adım]
    3. [Üçüncü adım]
-   • **İzlenecek Belirtiler:**
    • **Doktora Başvuru Zamanı:**
 
 Her yanıtında şu özellikleri koru:
@@ -145,6 +214,15 @@ Formatlamayı doğru kullan:
 export class MediAI {
   private model: ChatGoogleGenerativeAI;
   private messageHistory: { role: string; content: string }[] = [];
+  private userContext: UserContext = {
+    medications: [],
+    healthMetrics: [],
+    preferences: {
+      reminderType: "notification",
+      language: "tr",
+      accessibilityMode: false,
+    },
+  };
 
   constructor() {
     if (!GOOGLE_API_KEY) {
@@ -155,22 +233,21 @@ export class MediAI {
       apiKey: GOOGLE_API_KEY,
       modelName: "gemini-pro",
       maxOutputTokens: 1024,
-      temperature: 0.7,
+      temperature: 0.3,
       maxRetries: 3,
     });
 
-    // İlk karşılama mesajını ekle
     this.messageHistory.push({
       role: "assistant",
       content:
-        "Merhaba! Ben Medi, sağlık asistanınız. İlaç kullanımı konusunda size yardımcı olmak için buradayım. İlaç hatırlatıcıları, kullanım bilgileri ve sağlık takibi konularında destek sağlayabilirim. Size nasıl yardımcı olabilirim?",
+        "Merhaba! Ben Medi, ReMedi uygulamasının akıllı sağlık asistanıyım. Size ilaç takibi oluşturma, sağlık izleme ve günlük sağlık rutinlerinizi ReMedi üzerinden yönetmenizde yardımcı olabilirim. Nasıl yardımcı olabilirim?",
     });
   }
 
   private formatResponse(text: string): string {
     return text
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Kalın yazı
-      .replace(/_(.*?)_/g, "<em>$1</em>") // İtalik yazı
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/_(.*?)_/g, "<em>$1</em>")
       .replace(/#{1,3}\s/g, "")
       .replace(/[-–—]\s/g, "• ")
       .replace(/\n\s*([•])/g, "\n$1")
@@ -179,20 +256,90 @@ export class MediAI {
       .trim();
   }
 
+  public updateUserContext(context: Partial<UserContext>) {
+    this.userContext = {
+      ...this.userContext,
+      ...context,
+    };
+  }
+
+  public addMedication(name: string, schedule: string) {
+    if (!this.userContext.medications) {
+      this.userContext.medications = [];
+    }
+    this.userContext.medications.push({
+      name,
+      schedule,
+      lastTaken: new Date().toISOString(),
+    });
+  }
+
+  public addHealthMetric(type: string, value: number) {
+    if (!this.userContext.healthMetrics) {
+      this.userContext.healthMetrics = [];
+    }
+    this.userContext.healthMetrics.push({
+      type,
+      value,
+      timestamp: Date.now(),
+    });
+  }
+
+  public addMedicationSchedule(name: string, dosage: string, time: string) {
+    if (!this.userContext.medications) {
+      this.userContext.medications = [];
+    }
+
+    const schedule: MedicationSchedule = {
+      name,
+      dosage,
+      time,
+      isActive: true,
+    };
+
+    this.userContext.medications.push({
+      name,
+      schedule: `${dosage} - ${time}`,
+      lastTaken: new Date().toISOString(),
+      scheduleDetails: schedule,
+    });
+  }
+
+  private getContextualPrompt(userMessage: string): string {
+    let contextPrompt = "";
+
+    if (this.userContext.medications?.length) {
+      contextPrompt += "\nKullanıcının mevcut ilaçları:\n";
+      this.userContext.medications.forEach((med) => {
+        contextPrompt += `• ${med.name} (${med.schedule})\n`;
+      });
+    }
+
+    if (this.userContext.healthMetrics?.length) {
+      contextPrompt += "\nSon sağlık ölçümleri:\n";
+      this.userContext.healthMetrics.slice(-3).forEach((metric) => {
+        contextPrompt += `• ${metric.type}: ${metric.value}\n`;
+      });
+    }
+
+    return contextPrompt;
+  }
+
   async chat(message: string): Promise<string> {
     try {
-      // Yeni mesajı ekle
       this.messageHistory.push({ role: "user", content: message });
 
-      // Mesaj geçmişini dönüştür
+      const contextPrompt = this.getContextualPrompt(message);
       const chatMessages = this.messageHistory.map((msg) =>
         msg.role === "user"
           ? new HumanMessage(msg.content)
           : new AIMessage(msg.content)
       );
 
-      // System message'ı en başa ekle
-      const messages = [new SystemMessage(systemPrompt), ...chatMessages];
+      const messages = [
+        new SystemMessage(systemPrompt + contextPrompt),
+        ...chatMessages,
+      ];
 
       const response = await this.model.invoke(messages);
 
@@ -230,7 +377,6 @@ export class MediAI {
     }
   }
 
-  // İlk karşılama mesajını döndür
   getWelcomeMessage(): string {
     return this.messageHistory[0].content;
   }
