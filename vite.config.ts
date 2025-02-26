@@ -9,6 +9,10 @@ export default defineConfig({
       "@": "/src",
     },
   },
+  optimizeDeps: {
+    include: ["react", "react-dom", "@mui/material", "@mui/icons-material"],
+    exclude: [],
+  },
   build: {
     outDir: "dist",
     assetsDir: "assets",

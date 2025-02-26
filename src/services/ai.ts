@@ -319,13 +319,29 @@ export class MediAI {
       throw new Error("Google API Key is not set in environment variables");
     }
 
-    this.model = new ChatGoogleGenerativeAI({
-      apiKey: GOOGLE_API_KEY,
-      modelName: "gemini-1.0-pro",
-      maxOutputTokens: 1024,
-      temperature: 0.3,
-      maxRetries: 3,
-    });
+    console.log(
+      "Initializing AI with API key:",
+      GOOGLE_API_KEY.substring(0, 8) + "..."
+    );
+
+    try {
+      this.model = new ChatGoogleGenerativeAI({
+        apiKey: GOOGLE_API_KEY,
+        modelName: "gemini-2.0-flash-lite",
+        maxOutputTokens: 2048,
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+        maxRetries: 3,
+      });
+
+      console.log(
+        "AI Model initialized successfully with Gemini 2.0 Flash Lite"
+      );
+    } catch (error) {
+      console.error("Error initializing AI model:", error);
+      throw error;
+    }
 
     this.messageHistory = [
       {
@@ -432,7 +448,16 @@ export class MediAI {
         ...chatMessages,
       ];
 
-      const response = await this.model.invoke(messages);
+      console.log("Sending request to Google AI API...");
+      const response = await this.model.invoke(messages).catch((error) => {
+        console.error("Google AI API Error Details:", {
+          status: error.status,
+          message: error.message,
+          details: error.details || "No additional details",
+        });
+        throw error;
+      });
+      console.log("Received response from Google AI API");
 
       let aiResponse = "";
 
@@ -462,8 +487,19 @@ export class MediAI {
       });
 
       return formattedResponse;
-    } catch (error) {
-      console.error("AI Error:", error);
+    } catch (error: any) {
+      console.error("AI Error:", {
+        name: error?.name,
+        message: error?.message,
+        status: error?.status,
+        details: error?.details,
+        stack: error?.stack,
+      });
+
+      if (error?.message?.includes("404")) {
+        return "API bağlantısında bir sorun oluştu. Lütfen API anahtarınızı ve model yapılandırmanızı kontrol edin.";
+      }
+
       return "Üzgünüm, şu anda yanıt veremiyorum. Lütfen daha sonra tekrar deneyin.";
     }
   }
