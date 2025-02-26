@@ -321,17 +321,18 @@ export class MediAI {
 
     this.model = new ChatGoogleGenerativeAI({
       apiKey: GOOGLE_API_KEY,
-      modelName: "gemini-pro",
+      modelName: "gemini-1.0-pro",
       maxOutputTokens: 1024,
       temperature: 0.3,
       maxRetries: 3,
     });
 
-    this.messageHistory.push({
-      role: "assistant",
-      content:
-        "Merhaba! Ben Medi, ReMedi uygulamasının akıllı sağlık asistanıyım. Size ilaç takibi oluşturma, sağlık izleme ve günlük sağlık rutinlerinizi ReMedi üzerinden yönetmenizde yardımcı olabilirim. Nasıl yardımcı olabilirim?",
-    });
+    this.messageHistory = [
+      {
+        role: "assistant",
+        content: "Merhaba! Ben Medi, size nasıl yardımcı olabilirim?",
+      },
+    ];
   }
 
   private formatResponse(text: string): string {
