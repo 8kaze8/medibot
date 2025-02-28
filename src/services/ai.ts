@@ -315,7 +315,14 @@ export class MediAI {
   };
 
   constructor() {
-    if (!GOOGLE_API_KEY) {
+    if (!GOOGLE_API_KEY || GOOGLE_API_KEY === "your_api_key_here") {
+      this.messageHistory = [
+        {
+          role: "assistant",
+          content:
+            "Merhabalar ben Medi! Google Yapay Zeka ve Teknoloji Akademisi Ideathon etkinliği için geliştirilen bu proje artık demo aşamasındadır. Projeyi kendi bilgisayarınıza klonlayarak kullanmak için Github linkini ziyaret edebilirsiniz.",
+        },
+      ];
       return;
     }
 
@@ -329,17 +336,17 @@ export class MediAI {
         topP: 0.95,
         maxRetries: 3,
       });
+
+      this.messageHistory = [
+        {
+          role: "assistant",
+          content:
+            "Merhabalar ben Medi! Google Yapay Zeka ve Teknoloji Akademisi Ideathon etkinliği için geliştirilen bu proje artık demo aşamasındadır. Projeyi kendi bilgisayarınıza klonlayarak kullanmak için Github linkini ziyaret edebilirsiniz.",
+        },
+      ];
     } catch (error) {
       console.error("Error initializing AI model:", error);
     }
-
-    this.messageHistory = [
-      {
-        role: "assistant",
-        content:
-          "Merhabalar ben Medi! Google Yapay Zeka ve Teknoloji Akademisi Ideathon etkinliği için geliştirilen bu proje artık demo aşamasındadır. Projeyi kendi bilgisayarınıza klonlayarak kullanmak için Github linkini ziyaret edebilirsiniz.",
-      },
-    ];
   }
 
   private formatResponse(text: string): string {
@@ -424,8 +431,12 @@ export class MediAI {
   }
 
   async chat(message: string): Promise<string> {
+    if (!GOOGLE_API_KEY || GOOGLE_API_KEY === "your_api_key_here") {
+      return "API anahtarı gerekli. Lütfen .env dosyasına geçerli bir API anahtarı ekleyin.";
+    }
+
     if (!this.model) {
-      return "API anahtarı gerekli.";
+      return "API bağlantısı kurulamadı. Lütfen daha sonra tekrar deneyin.";
     }
 
     try {

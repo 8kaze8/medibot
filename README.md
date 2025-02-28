@@ -66,7 +66,8 @@ Medi, yaşlılar ve kronik hastalığı olan kişiler için geliştirilmiş, ila
 4. `.env` dosyasına API anahtarınızı ekleyin:
 
    ```env
-   VITE_GOOGLE_API_KEY=your_api_key_here
+   # .env dosyası
+   VITE_GOOGLE_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  # Google Cloud Console'dan aldığınız API anahtarını buraya yapıştırın
    ```
 
 5. Geliştirme sunucusunu başlatın:
