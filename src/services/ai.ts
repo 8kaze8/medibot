@@ -496,8 +496,8 @@ export class MediAI {
         stack: error?.stack,
       });
 
-      if (error?.message?.includes("404")) {
-        return "API bağlantısında bir sorun oluştu. Lütfen API anahtarınızı ve model yapılandırmanızı kontrol edin.";
+      if (error?.message?.includes("404") || !GOOGLE_API_KEY) {
+        return "Google Yapay Zeka ve Teknoloji Akademisi Ideathon etkinliği için geliştirilen bu proje artık demo aşamasındadır. Projeyi kendi bilgisayarınıza klonlayarak kullanmak için Github linkini ziyaret edebilirsiniz.";
       }
 
       return "Üzgünüm, şu anda yanıt veremiyorum. Lütfen daha sonra tekrar deneyin.";

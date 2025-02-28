@@ -2,6 +2,8 @@
 
 Medi, ReMedi sağlık uygulamasının yapay zeka destekli akıllı asistanıdır. Bu proje, Google Yapay Zeka ve Teknoloji Akademisi'nin düzenlediği Ideathon etkinliği kapsamında geliştirilmiş olup, ileride ReMedi uygulamasına tam entegrasyonu planlanmaktadır.
 
+> **ÖNEMLİ NOT:** Bu proje şu anda demo aşamasındadır. Projeyi kendi bilgisayarınızda çalıştırmak için Google Cloud Console'dan bir API anahtarı almanız ve `.env` dosyasına eklemeniz gerekmektedir. Detaylı bilgi için kurulum adımlarını takip edin.
+
 ## 🎯 Proje Hakkında
 
 Medi, yaşlılar ve kronik hastalığı olan kişiler için geliştirilmiş, ilaç yönetimi ve sağlık takibi konusunda uzmanlaşmış bir sağlık asistanıdır. Google'ın Gemini yapay zeka modelini kullanarak, kullanıcılara kişiselleştirilmiş sağlık desteği sunar.
@@ -54,13 +56,20 @@ Medi, yaşlılar ve kronik hastalığı olan kişiler için geliştirilmiş, ila
    npm install
    ```
 
-3. `.env` dosyası oluşturun ve Google API anahtarınızı ekleyin:
+3. Google Cloud Console'dan API anahtarı alın:
+
+   - [Google Cloud Console](https://console.cloud.google.com)'a gidin
+   - Yeni bir proje oluşturun veya mevcut projenizi seçin
+   - Gemini API'yi etkinleştirin
+   - API anahtarı oluşturun
+
+4. `.env` dosyasına API anahtarınızı ekleyin:
 
    ```env
    VITE_GOOGLE_API_KEY=your_api_key_here
    ```
 
-4. Geliştirme sunucusunu başlatın:
+5. Geliştirme sunucusunu başlatın:
    ```bash
    npm run dev
    ```
