@@ -350,7 +350,14 @@ export class MediAI {
   }
 
   private formatResponse(text: string): string {
-    return text
+    let formattedText = text;
+
+    // Eğer metin 300 karakterden uzunsa ve detaylı bir açıklama içeriyorsa
+    if (text.length > 300 && !text.includes("detay için yazınız")) {
+      formattedText = text.slice(0, 300) + "... (detay için 'detay' yazınız)";
+    }
+
+    return formattedText
       .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
       .replace(/_(.*?)_/g, "<em>$1</em>")
       .replace(/#{1,3}\s/g, "")
