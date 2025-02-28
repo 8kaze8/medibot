@@ -302,7 +302,7 @@ Formatlamayı doğru kullan:
 • ÖNEMLİ UYARILARI BÜYÜK HARFLE yaz`;
 
 export class MediAI {
-  private model: ChatGoogleGenerativeAI;
+  private model?: ChatGoogleGenerativeAI;
   private messageHistory: { role: string; content: string }[] = [];
   private userContext: UserContext = {
     medications: [],
@@ -316,37 +316,28 @@ export class MediAI {
 
   constructor() {
     if (!GOOGLE_API_KEY) {
-      throw new Error("Google API Key is not set in environment variables");
+      return;
     }
-
-    console.log(
-      "Initializing AI with API key:",
-      GOOGLE_API_KEY.substring(0, 8) + "..."
-    );
 
     try {
       this.model = new ChatGoogleGenerativeAI({
         apiKey: GOOGLE_API_KEY,
-        modelName: "gemini-2.0-flash-lite",
+        modelName: "gemini-pro",
         maxOutputTokens: 2048,
         temperature: 0.7,
         topK: 40,
         topP: 0.95,
         maxRetries: 3,
       });
-
-      console.log(
-        "AI Model initialized successfully with Gemini 2.0 Flash Lite"
-      );
     } catch (error) {
       console.error("Error initializing AI model:", error);
-      throw error;
     }
 
     this.messageHistory = [
       {
         role: "assistant",
-        content: "Merhaba! Ben Medi, size nasıl yardımcı olabilirim?",
+        content:
+          "Merhabalar ben Medi! Google Yapay Zeka ve Teknoloji Akademisi Ideathon etkinliği için geliştirilen bu proje artık demo aşamasındadır. Projeyi kendi bilgisayarınıza klonlayarak kullanmak için Github linkini ziyaret edebilirsiniz.",
       },
     ];
   }
@@ -433,6 +424,10 @@ export class MediAI {
   }
 
   async chat(message: string): Promise<string> {
+    if (!this.model) {
+      return "API anahtarı gerekli.";
+    }
+
     try {
       this.messageHistory.push({ role: "user", content: message });
 
@@ -496,8 +491,8 @@ export class MediAI {
         stack: error?.stack,
       });
 
-      if (error?.message?.includes("404") || !GOOGLE_API_KEY) {
-        return "Google Yapay Zeka ve Teknoloji Akademisi Ideathon etkinliği için geliştirilen bu proje artık demo aşamasındadır. Projeyi kendi bilgisayarınıza klonlayarak kullanmak için Github linkini ziyaret edebilirsiniz.";
+      if (error?.message?.includes("404")) {
+        return "API anahtarı geçersiz.";
       }
 
       return "Üzgünüm, şu anda yanıt veremiyorum. Lütfen daha sonra tekrar deneyin.";
